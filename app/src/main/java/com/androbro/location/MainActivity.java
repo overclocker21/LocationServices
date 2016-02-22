@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
         temperatureTV = (TextView) findViewById(R.id.temperature_string);
         windTV = (TextView) findViewById(R.id.wind_string);
 
+        //instantiating helper class to determine location of the device using GPS:
+
         gpsTracker = new GPSTracker(MainActivity.this);
 
         if (gpsTracker.canGetLocation()) {
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
             deviceLongitude = gpsTracker.getLongitude();
             Toast.makeText(getApplicationContext(), "Your location is: \nLat: " + deviceLatitude + "\nLong: " + deviceLongitude, Toast.LENGTH_LONG).show();
         } else {
+            //show alert dialog if the GPS is off and redirect to GPS settings of the device
             gpsTracker.showSettingsAlert();
         }
 
@@ -78,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected NodeList doInBackground(Void... params) {
 
+            //getting input stream from raw xml file:
+
             InputStream inputStream = context.getResources().openRawResource(R.raw.station_lookup2);
             DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = null;
@@ -101,56 +106,62 @@ public class MainActivity extends AppCompatActivity {
                 double distance = 0;
 
                 data = new ArrayList<Station>();
-                station = new Station();
+
+                //for each station i'm creating Station object, that implements Comparable
+                //interface, which has overridden compareTo() method to compare distances from device
+                //to particular weather station:
+
                 for (int i = 0; i < itemList.getLength(); i++) {
+                    station = new Station();
                     currentItem = itemList.item(i);
-                    //Log.i("Current Item: ", "" + currentItem.getNodeName());
                     itemChildren = currentItem.getChildNodes();
+
+                    //in every Station object i'm storing parsed latitude, longitude and
+                    //corresponding xml link that will be used for futher processing:
 
                     for (int j = 0; j < itemChildren.getLength(); j++) {
 
                         currentChild = itemChildren.item(j);
-                        //Log.i("Current Child: ", "" + currentChild.getNodeName());
+
                         if (currentChild.getNodeName().equalsIgnoreCase("latitude")) {
 
                             stationLatitude = Double.parseDouble(currentChild.getTextContent());
-
-                            //Log.i("Latitude: ", "" + stationLatitude);
-
                             station.setLatitude(stationLatitude);
 
                         } else if (currentChild.getNodeName().equalsIgnoreCase("longitude")) {
 
                             stationLongitude = Double.parseDouble(currentChild.getTextContent());
-
-                            //Log.i("Longitude: ", "" + stationLongitude);
-
                             station.setLongitude(stationLongitude);
 
                         } else if (currentChild.getNodeName().equalsIgnoreCase("xml_url")) {
 
                             xml = currentChild.getTextContent();
-
-                            // Log.i("XML: ", "" + xml);
-
                             station.setUrl(xml);
                         }
 
-                        distance = calcDistance(deviceLongitude, deviceLatitude, station.getLongitude(), station.getLatitude());
-
-                        station.setDistance(distance);
-
-                        data.add(station);
-
                     }
-                    //access abject here
-                    //Log.i("Distance", "" + station.getDistance());
 
+                    //calculating distance and storing it in the object:
+
+                    distance = calcDistance(deviceLongitude, deviceLatitude, station.getLongitude(), station.getLatitude());
+                    station.setDistance(distance);
+
+                    //adding this Station object to ArrayList. Same way in the loop other objects
+                    //will be added as well:
+
+                    data.add(station);
                 }
+                //sorting ArrayList based on distance(to get the shortest one)
+
                 Collections.sort(data);
+
+                //now I know that the very first Station object has the shortest distance
+                //thus I'm accessing its corresponding xml:
 
                 Log.i("Shortest distance", "" + data.get(0).getDistance());
                 Log.i("Corresponding XML", "" + data.get(0).getUrl());
+
+                //storing it in variable for further parsing and setting the results in onPostExecute:
 
                 String parsedUrl = data.get(0).getUrl();
 
@@ -162,6 +173,8 @@ public class MainActivity extends AppCompatActivity {
             return list;
         }
     }
+
+    //method to calculate distance between two object knowing their coordinates:
 
     private double calcDistance(double rLong1, double rLat1, double rLong2, double rLat2) {
 
@@ -180,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
         return dist;
     }
 
+
     public NodeList returnNodes(String parsedUrl) {
         try {
             URL url = new URL(parsedUrl);
@@ -191,7 +205,6 @@ public class MainActivity extends AppCompatActivity {
             DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = builderFactory.newDocumentBuilder();
             Document xmlDocument = documentBuilder.parse(inputStream);
-
             //getting root element of the XML doc
             Element rootElement = xmlDocument.getDocumentElement();
             Log.i("", "" + rootElement.getTagName());
