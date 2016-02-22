@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<wx_station_index>
+<credit>NOAA's National Weather Service</credit>
+<credit_URL>http://weather.gov/</credit_URL>
+<image>
+<url>http://weather.gov/images/xml_logo.gif</url>
+<title>NOAA's National Weather Service</title>
+<link>http://weather.gov</link>
+</image>
+<suggested_pickup>08:00 EST</suggested_pickup>
+<suggested_pickup_period>1140</suggested_pickup_period>
+<station>
+<station_id>TAPA</station_id>
+<state>AG</state>
+<station_name>Vc Bird Intl Airport Antigua</station_name>
+<latitude>17.117</latitude>
+<longitude>-61.783</longitude>
+<html_url>http://weather.noaa.gov/weather/current/TAPA.html</html_url>
+<rss_url>http://weather.gov/xml/current_obs/TAPA.rss</rss_url>
+<xml_url>http://weather.gov/xml/current_obs/TAPA.xml</xml_url>
+</station>
+<station>
+<station_id>TKPN</station_id>
+<state>AG</state>
+<station_name>Charlestown/Newcast</station_name>
+<latitude>17.2</latitude>
+<longitude>-62.583</longitude>
+<html_url>http://weather.noaa.gov/weather/current/TKPN.html</html_url>
+<rss_url>http://weather.gov/xml/current_obs/TKPN.rss</rss_url>
+<xml_url>http://weather.gov/xml/current_obs/TKPN.xml</xml_url>
+</station>
+<station>
+<station_id>TRPM</station_id>
+<state>AG</state>
+<station_name>Blackburne/Plymouth</station_name>
+<latitude>16.75</latitude>
+<longitude>-62.167</longitude>
+<html_url>http://weather.noaa.gov/weather/current/TRPM.html</html_url>
+<rss_url>http://weather.gov/xml/current_obs/TRPM.rss</rss_url>
+<xml_url>http://weather.gov/xml/current_obs/TRPM.xml</xml_url>
+</station>
+<station>
+<station_id>PAAK</station_id>
+<state>AK</state>
+<station_name>Atka Airport</station_name>
+<latitude>52.217</latitude>
+<longitude>-174.2</longitude>
+<html_url>http://weather.noaa.gov/weather/current/PAAK.html</html_url>
+<rss_url>http://weather.gov/xml/current_obs/PAAK.rss</rss_url>
+<xml_url>http://weather.gov/xml/current_obs/PAAK.xml</xml_url>
+</station>
+<station>
+<station_id>PAAP</station_id>
+<state>AK</state>
+<station_name>Port Alexander</station_name>
+<latitude>56.26</latitude>
+<longitude>-134.66</longitude>
+<html_url>http://weather.noaa.gov/weather/current/PAAP.html</html_url>
+<rss_url>http://weather.gov/xml/current_obs/PAAP.rss</rss_url>
+<xml_url>http://weather.gov/xml/current_obs/PAAP.xml</xml_url>
+</station>
+
+</wx_station_index>
