@@ -1,10 +1,13 @@
 package com.androbro.location;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView weatherTV;
     private TextView temperatureTV;
     private TextView windTV;
+    private MenuItem launchMaps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +67,29 @@ public class MainActivity extends AppCompatActivity {
         MyAsyncTask asyncTask = new MyAsyncTask();
         asyncTask.execute();
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.launch_maps, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.launch_maps){
+
+            Intent intent = new Intent(this, MapsActivity.class);
+            startActivity(intent);
+
+            return true;
+
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
     public class MyAsyncTask extends AsyncTask<Void, Void, NodeList> {
 
