@@ -37,7 +37,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView weatherTV;
     private TextView temperatureTV;
     private TextView windTV;
-    private MenuItem launchMaps;
+
+    public double returnedLatitude;
+    public double returnedLongitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         if (gpsTracker.canGetLocation()) {
             deviceLatitude = gpsTracker.getLatitude();
             deviceLongitude = gpsTracker.getLongitude();
-            Toast.makeText(getApplicationContext(), "Your location is: \nLat: " + deviceLatitude + "\nLong: " + deviceLongitude, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), "Your location is: \nLat: " + deviceLatitude + "\nLong: " + deviceLongitude, Toast.LENGTH_LONG).show();
         } else {
             //show alert dialog if the GPS is off and redirect to GPS settings of the device
             gpsTracker.showSettingsAlert();
@@ -80,20 +82,36 @@ public class MainActivity extends AppCompatActivity {
 
         if (id == R.id.launch_maps){
 
+            //creating intent to lauch Maps Activity:
+
             Intent intent = new Intent(this, MapsActivity.class);
-            startActivity(intent);
+
+            //need a simple check, because the user may wish to launch Maps before the document gets parsed
+            //usually it takes 1-2 seconds to parse and get coordinates of the station, but I had to handle this
+
+            if (returnedLatitude == 0 && returnedLongitude == 0){
+                Toast.makeText(getApplicationContext(), "Please wait a bit and try again", Toast.LENGTH_LONG).show();
+            } else {
+                Bundle extras = new Bundle();
+                extras.putDouble("latitude", returnedLatitude);
+                extras.putDouble("longitude", returnedLongitude);
+                intent.putExtras(extras);
+
+                startActivity(intent);
+            }
 
             return true;
-
         }
-
         return super.onOptionsItemSelected(item);
     }
 
 
-    public class MyAsyncTask extends AsyncTask<Void, Void, NodeList> {
+    public class MyAsyncTask extends AsyncTask<Void, Void, Wrapper> {
 
-        NodeList list = null;
+        //created Wrapper class and its object, so I could return multiple objects in onPostExecute:
+        //in this case I'm returning 3: Nodelist, latitude and longitude
+
+        Wrapper wrapper = null;
 
         @Override
         protected void onPreExecute() {
@@ -101,12 +119,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(NodeList list) {
-            processNodeList(list);
+        protected void onPostExecute(Wrapper wrapper) {
+
+            NodeList listToParse = wrapper.getList();
+
+            processNodeList(listToParse);
+
+            Log.i("Returned latitude", "" + wrapper.getLatitude());
+            Log.i("Returned longitude", "" + wrapper.getLatitude());
+
+            //storing longitude and latitude in mainactivity's variables so we can use them in onOptionsItemSelected
+            MainActivity mainActivity = (MainActivity) context;
+            mainActivity.returnedLatitude = wrapper.getLatitude();
+            mainActivity.returnedLongitude = wrapper.getLongitude();
         }
 
         @Override
-        protected NodeList doInBackground(Void... params) {
+        protected Wrapper doInBackground(Void... params) {
 
             //getting input stream from raw xml file:
 
@@ -191,13 +220,20 @@ public class MainActivity extends AppCompatActivity {
                 //storing it in variable for further parsing and setting the results in onPostExecute:
 
                 String parsedUrl = data.get(0).getUrl();
+                double myLatitude = data.get(0).getLatitude();
+                double myLongitude = data.get(0).getLongitude();
+                NodeList list = returnNodes(parsedUrl);
 
-                list = returnNodes(parsedUrl);
+                wrapper = new Wrapper();
+
+                wrapper.setList(list);
+                wrapper.setLongitude(myLongitude);
+                wrapper.setLatitude(myLatitude);
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return list;
+            return wrapper;
         }
     }
 
@@ -283,6 +319,36 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
+        }
+    }
+
+    public class Wrapper{
+        public NodeList list;
+        public double longitude;
+        public double latitude;
+
+        public NodeList getList() {
+            return list;
+        }
+
+        public void setList(NodeList list) {
+            this.list = list;
+        }
+
+        public double getLongitude() {
+            return longitude;
+        }
+
+        public void setLongitude(double longitude) {
+            this.longitude = longitude;
+        }
+
+        public double getLatitude() {
+            return latitude;
+        }
+
+        public void setLatitude(double latitude) {
+            this.latitude = latitude;
         }
     }
 }
